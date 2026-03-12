@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"creditCard"})
+@ToString(exclude = {"creditCard"})
 public class Transaction {
 
     @Id

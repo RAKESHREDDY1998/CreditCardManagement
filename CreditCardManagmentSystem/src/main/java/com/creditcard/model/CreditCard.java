@@ -14,6 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"transactions", "user"})
+@ToString(exclude = {"transactions", "user"})
 public class CreditCard {
 
     @Id

@@ -33,6 +33,7 @@ public class TransactionService {
 
         Transaction.TransactionStatus status;
         String logMessage;
+        BigDecimal processedAmount = request.getAmount();
 
         switch (request.getType()) {
             case PURCHASE, CASH_ADVANCE -> {
@@ -47,12 +48,11 @@ public class TransactionService {
             }
             case PAYMENT, REFUND -> {
                 // Ensure payment does not exceed current balance
-                BigDecimal maxRefund = card.getCurrentBalance();
-                if (request.getAmount().compareTo(maxRefund) > 0 && request.getType() == Transaction.TransactionType.PAYMENT) {
-                    cardService.updateCardBalance(card, maxRefund, false);
-                } else {
-                    cardService.updateCardBalance(card, request.getAmount(), false);
+                BigDecimal maxPayment = card.getCurrentBalance();
+                if (processedAmount.compareTo(maxPayment) > 0 && request.getType() == Transaction.TransactionType.PAYMENT) {
+                    processedAmount = maxPayment;
                 }
+                cardService.updateCardBalance(card, processedAmount, false);
                 status = Transaction.TransactionStatus.APPROVED;
                 logMessage = "APPROVED - Payment/Refund processed";
             }
@@ -69,7 +69,7 @@ public class TransactionService {
 
         Transaction transaction = Transaction.builder()
             .creditCard(card)
-            .amount(request.getAmount())
+            .amount(processedAmount)
             .merchantName(request.getMerchantName())
             .description(request.getDescription())
             .type(request.getType())
@@ -83,7 +83,7 @@ public class TransactionService {
             saved.getReferenceNumber(),
             saved.getType(),
             card.getCardNumber().substring(card.getCardNumber().length() - 4),
-            request.getAmount(),
+            processedAmount,
             request.getMerchantName(),
             logMessage);
         return saved;
