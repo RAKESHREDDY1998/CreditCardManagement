@@ -64,7 +64,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/statements/generate/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
-            .headers(headers -> headers.frameOptions(fo -> fo.disable())) // For H2 console
+            .headers(headers -> headers.frameOptions(fo -> fo.sameOrigin())) // For H2 console
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
